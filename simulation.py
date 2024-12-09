@@ -226,7 +226,7 @@ def get_silver_step_size(n, L):
 # Example on logistic regression problem
 def logistic_regression():
     global X, y
-    translated = False
+    translated = True
 
     np.random.seed(1)
     X_train, X_test, y_train, y_test = get_data_matrices()
@@ -280,17 +280,17 @@ def logistic_regression():
     # plot the results
     plt.plot(np.arange(max_iter), errors_classic, label="Constant stepsize 1")
     plt.plot(np.arange(max_iter), errors_optimal, label="Optimal constant stepsize $h_{\mathrm{opt}}$")
-    plt.plot(np.arange(max_iter), errors_VT, label="Vaisbourd-Teboulle dynamic step size")
-    plt.plot(np.arange(50), errors_das_gupta, label="Das Gupta dynamic step size")
+    plt.plot(np.arange(max_iter), errors_VT, label="Vaisbourd-Teboulle dynamic stepsize")
+    plt.plot(np.arange(50), errors_das_gupta, label="Das Gupta dynamic stepsize")
     plt.plot(np.arange(max_iter), errors_Grimmer31, label="Grimmer's pattern of size 31")
-    plt.plot(np.arange(max_iter), errors_Silver, label="Silver steps schedule of size 31")
+    plt.plot(np.arange(max_iter), errors_Silver, label="Silver steps schedule")
     plt.plot(np.arange(max_iter), errors_nesterov, label="Nesterov's accelerated gradient descent", linestyle="--")
     plt.xlabel("Iteration")
     plt.ylabel("Error")
     plt.yscale("log")
-
     plt.legend()
     plt.grid()
+    plt.savefig('logistic_regression.pdf')
     plt.show()
 
 # Example on linear system solving problem
@@ -320,7 +320,7 @@ def linear_system_solving():
     
     # 4. Alternating dynamic step size mentionned by Das Gupta
     step_sizes_das_gupta = get_das_gupta_step_size50(L)
-    _, errors_das_gupta = gradient_descent_dynamic(f, grad_f, x0, f_star, step_sizes_das_gupta, max_iter)
+    _, errors_das_gupta = gradient_descent_dynamic(f, grad_f, x0, f_star, step_sizes_das_gupta, 50)
 
     # 5. Grimmer's pattern of size 31
     step_size_Grimmer31 = get_grimmer_step_size31(max_iter, L)
@@ -335,10 +335,10 @@ def linear_system_solving():
     # plot the results
     plt.plot(np.arange(max_iter), errors_classic, label="Constant stepsize 1")
     plt.plot(np.arange(max_iter), errors_optimal, label="Optimal constant stepsize $h_{\mathrm{opt}}$")
-    plt.plot(np.arange(max_iter), errors_VT, label="Vaisbourd-Teboulle dynamic step size")
-    plt.plot(np.arange(max_iter), errors_das_gupta, label="Das Gupta dynamic step size")
+    plt.plot(np.arange(max_iter), errors_VT, label="Vaisbourd-Teboulle dynamic stepsize")
+    plt.plot(np.arange(max_iter), errors_das_gupta, label="Das Gupta dynamic stepsize")
     plt.plot(np.arange(max_iter), errors_Grimmer31, label="Grimmer's pattern of size 31")
-    plt.plot(np.arange(max_iter), errors_Silver, label="Silver steps schedule of size 31")
+    plt.plot(np.arange(max_iter), errors_Silver, label="Silver steps schedule")
     plt.plot(np.arange(max_iter), errors_nesterov, label="Nesterov's accelerated gradient descent", linestyle="--")
     plt.xlabel("Iteration")
     plt.ylabel("Error")
@@ -346,6 +346,7 @@ def linear_system_solving():
 
     plt.legend()
     plt.grid()
+    plt.savefig('linear_system_solving.pdf')
     plt.show()
 
 def plot_theoretical_rates():
@@ -354,9 +355,12 @@ def plot_theoretical_rates():
     L = 1
     x0 = 1
     x_star = 0
+
+    # 1. Classic gradient descent
     th_errors_classic = np.array([np.linalg.norm(x0-x_star)**2*L*1/(4*i+2) for i in range(max_iter)])
     plt.plot(np.arange(max_iter), th_errors_classic, label="Constant stepsize 1")
 
+    # 2. THG optimal constant stepsize
     step_size_opt = get_optimal_constant_step_size(max_iter, L)*L
 
     # Check with number presented in Teboulle23 Table 1 page 81 for max_iter=100, get 395.10932941 :)
@@ -364,22 +368,26 @@ def plot_theoretical_rates():
     th_errors_optimal = np.array([np.linalg.norm(x0-x_star)**2*L/2*max(1/(2*i*step_size_opt + 1), (1-step_size_opt)**(2*i)) for i in range(1, max_iter+1)])
     plt.plot(np.arange(max_iter), th_errors_optimal, label="Optimal constant stepsize $h_{\mathrm{opt}}$")
 
+    # 3. Vaisbourd-Teboulle dynamic step size
     step_sizes_VT = get_Vaisbourd_Teboulle_step_size(max_iter, L)
     Ts_VT = np.concatenate(([0], np.cumsum(step_sizes_VT)))
     # Check with number presented in Teboulle23 Table 1 page 81 for max_iter=100, get 391.66104219 :)
     #print((2*L*Ts_VT[-1] + 1))
     th_errors_VT = np.array([np.linalg.norm(x0-x_star)**2*L*1/(2*(2*L*Ts_VT[i] + 1)) for i in range(max_iter)])
-    plt.plot(np.arange(max_iter), th_errors_VT, label="Vaisbourd-Teboulle dynamic step size")
+    plt.plot(np.arange(max_iter), th_errors_VT, label="Vaisbourd-Teboulle dynamic stepsize")
 
+    # 4. Das Gupta optimized step size
     th_errors_das_gupta = np.array([np.linalg.norm(x0-x_star)**2*L*0.156/i**1.178 for i in range(50)])
-    plt.plot(np.arange(50), th_errors_das_gupta, label="Das Gupta dynamic step size", linestyle="--")
+    plt.plot(np.arange(50), th_errors_das_gupta, label="Das Gupta dynamic stepsize", linestyle="--")
 
+    # 5. Grimmer's pattern of size 31
     step_size_Grimmer31 = get_grimmer_step_size31(31, L)*L
     avg_Grimmer31 = np.mean(step_size_Grimmer31)
     indices = np.arange(31, max_iter + 1, 31)
     th_errors_Grimmer31 = np.array([np.linalg.norm(x0 - x_star)**2*L*1/(avg_Grimmer31*i) for i in indices])
     plt.scatter(indices, th_errors_Grimmer31, label="Grimmer's pattern of size 31", marker="x", color="purple")
 
+    # 6. Silver steps by Altschuler and Parrilo
     indices = [2**k - 1 for k in range(1, int(np.log2(max_iter)) + 1) if 2**k - 1 < max_iter]
     th_errors_Silver = np.array([np.linalg.norm(x0 - x_star)**2*L* 1/(2*i**(np.log2(np.sqrt(2)+1))) for i in indices])
     plt.scatter(indices, th_errors_Silver, label="Silver steps schedule", marker="x", color="red")
@@ -389,6 +397,7 @@ def plot_theoretical_rates():
     plt.yscale("log")
     plt.legend()
     plt.grid()
+    plt.savefig('theoretical_rates.pdf')
     plt.show()
     
 
