@@ -50,8 +50,11 @@ def get_data_matrices():
 
     # Normalize
     scaler = MinMaxScaler()
-    X_train = scaler.fit_transform(X_train)
+    X_train = scaler.fit_transform(X_train, y=y_train)
     X_test = scaler.transform(X_test)
+
+    largest_singular_value = np.linalg.norm(X_train, ord=2)
+    X_train = X_train / largest_singular_value
 
     print("Train shape:", X_train.shape)
     X_train.info()
