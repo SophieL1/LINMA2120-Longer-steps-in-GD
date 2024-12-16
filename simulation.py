@@ -351,7 +351,7 @@ def linear_system_solving():
 
 def plot_theoretical_rates():
     # plot theoretical results
-    max_iter = 2048
+    max_iter = 1024
     L = 1
     x0 = 1
     x_star = 0
@@ -361,11 +361,13 @@ def plot_theoretical_rates():
     plt.plot(np.arange(max_iter), th_errors_classic, label="Constant stepsize 1")
 
     # 2. THG optimal constant stepsize
-    step_size_opt = get_optimal_constant_step_size(max_iter, L)*L
+    step_size_opt = np.zeros(max_iter)
+    for i in range(1, max_iter+1):
+        step_size_opt[i-1] = get_optimal_constant_step_size(i, L)*L
 
-    # Check with number presented in Teboulle23 Table 1 page 81 for max_iter=100, get 395.10932941 :)
-    #print(1/max(1/(2*max_iter*step_size_opt + 1), (1-step_size_opt)**(2*max_iter))[0]) 
-    th_errors_optimal = np.array([np.linalg.norm(x0-x_star)**2*L/2*max(1/(2*i*step_size_opt + 1), (1-step_size_opt)**(2*i)) for i in range(1, max_iter+1)])
+    # Check with number presented in Teboulle23 Table 1 page 81 for max_iter=100, get 395.10932941232727 :)
+    #print(1/max(1/(2*max_iter*step_size_opt[-1] + 1), (1-step_size_opt[-1])**(2*max_iter))) 
+    th_errors_optimal = np.array([np.linalg.norm(x0-x_star)**2*L/2*max(1/(2*i*step_size_opt[i-1] + 1), (1-step_size_opt[i-1])**(2*i)) for i in range(1, max_iter+1)])
     plt.plot(np.arange(max_iter), th_errors_optimal, label="Optimal constant stepsize $h_{\mathrm{opt}}$")
 
     # 3. Vaisbourd-Teboulle dynamic step size
@@ -395,6 +397,7 @@ def plot_theoretical_rates():
     plt.xlabel("Iteration")
     plt.ylabel("Theoretical error upper bound")
     plt.yscale("log")
+    plt.xscale("log")
     plt.legend()
     plt.grid()
     plt.savefig('theoretical_rates.pdf')
@@ -403,5 +406,5 @@ def plot_theoretical_rates():
 
 if __name__ == "__main__" :
     plot_theoretical_rates()
-    logistic_regression()
-    linear_system_solving()
+    #logistic_regression()
+    #linear_system_solving()
