@@ -27,7 +27,7 @@ def f_logi(theta):
 
 def grad_f_logi(theta):
     """
-    Compute the gradient of f(theta).
+    Compute the gradient of f(theta) for logistic functin.
     """
     m = X.shape[0] 
     h = sigmoid(X @ theta)
@@ -79,7 +79,7 @@ def gradient_descent_constant(fun, grad_fun, x0, f_star, step_size, max_iter):
         x = x - step_size * grad_fun(x)
     return x, errors
 
-# Gradient descent with dynamic step size
+# Gradient descent with dynamic step size (non-constant step size)
 def gradient_descent_dynamic(fun, grad_fun, x0, f_star, step_sizes, max_iter):
     x = x0
     errors = np.zeros(max_iter)
@@ -163,6 +163,7 @@ def get_das_gupta_step_size50(L):
 
 # Grimmer's pattern of size 31
 def get_grimmer_step_size31(N, L):
+    # Taken from Grimmer et al. Accelerated Gradient Descent via Long Steps, 2023
     h31 = [1.4, 2.0, 1.4, 3.9, 1.4, 2.0, 1.4, 8.2,
     1.4, 2.0, 1.4, 3.9, 1.4, 2.0, 1.4, 72.3,
     1.4, 2.0, 1.4, 3.9, 1.4, 2.0, 1.4, 8.2,
@@ -173,6 +174,7 @@ def get_grimmer_step_size31(N, L):
 
 # Grimmer's pattern of size 63
 def get_grimmer_step_size63(N, L):
+    # Taken from Grimmer et al. Accelerated Gradient Descent via Long Steps, 2023
     h63 = [1.4, 2.0, 1.4, 3.9, 1.4, 2.0, 1.4, 7.2,
     1.4, 2.0, 1.4, 3.9, 1.4, 2.0, 1.4, 14.2,
     1.4, 2.0, 1.4, 3.9, 1.4, 2.0, 1.4, 7.2,
@@ -184,6 +186,7 @@ def get_grimmer_step_size63(N, L):
 
 # Grimmer's pattern of size 127
 def get_grimmer_step_size127(N, L):
+    # Taken from Grimmer et al. Accelerated Gradient Descent via Long Steps, 2023
     h127 = [1.4, 2.0, 1.4, 3.9, 1.4, 2.0, 1.4, 7.2,
     1.4, 2.0, 1.4, 3.9, 1.4, 2.0, 1.4, 12.6,
     1.4, 2.0, 1.4, 3.9, 1.4, 2.0, 1.4, 7.2,
@@ -397,7 +400,6 @@ def plot_theoretical_rates():
     plt.xlabel("Iteration")
     plt.ylabel("Theoretical error upper bound")
     plt.yscale("log")
-    plt.xscale("log")
     plt.legend()
     plt.grid()
     plt.savefig('theoretical_rates.pdf')
@@ -406,5 +408,5 @@ def plot_theoretical_rates():
 
 if __name__ == "__main__" :
     plot_theoretical_rates()
-    #logistic_regression()
-    #linear_system_solving()
+    logistic_regression()
+    linear_system_solving()

@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.linear_model import LogisticRegression
@@ -12,6 +11,7 @@ warnings.filterwarnings("ignore")
 from sklearn import set_config
 
 def get_data_matrices():
+    # Preprocessing inspired by https://www.kaggle.com/datasets/uciml/breast-cancer-wisconsin-data/code
     set_config(transform_output="pandas")
 
     df = pd.read_csv("data.csv")
@@ -29,9 +29,6 @@ def get_data_matrices():
     corr = df.corr()
     sorted_corr = corr.reindex(corr["diagnosis"].abs().sort_values(ascending=False).index, axis=1)
 
-    corr = df.corr()
-    sorted_corr = corr.reindex(corr["diagnosis"].abs().sort_values(ascending=False).index, axis=1)
-
     shuffled_df = df.sample(frac=1, random_state=42)
 
     X_train, X_test, y_train, y_test = train_test_split(
@@ -44,11 +41,9 @@ def get_data_matrices():
     scaler = MinMaxScaler()
     X_train = scaler.fit_transform(X_train, y=y_train)
     X_test = scaler.transform(X_test)
-
     largest_singular_value = np.linalg.norm(X_train, ord=2)
     X_train = X_train / largest_singular_value
 
-    print("Train shape:", X_train.shape)
     X_train.info()
 
     return X_train, X_test, y_train, y_test
