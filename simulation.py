@@ -57,7 +57,7 @@ def get_true_solution(X, y):
     """
     Find an approximate true solution to the logistic regression problem
     """
-    model = LogisticRegression(fit_intercept=False, solver='newton-cg', max_iter=10000)
+    model = LogisticRegression(fit_intercept=False, solver='newton-cg', max_iter=100000)
     model.fit(X, y)
     theta_star = np.hstack([model.coef_.flatten()])
     # Compute the minimum objective value f*
@@ -243,7 +243,8 @@ def logistic_regression():
         x_star = np.ones(ndim)
         grad_x_star = grad_f_logi(x_star)
         f_star = f_logi_plus_lin(x_star, grad_x_star)
-        grad_x_star = grad_f_logi_plus_lin(x_star, grad_x_star)
+        grad_zero = grad_f_logi_plus_lin(x_star, grad_x_star)
+        print(f"Gradient norm at x_star: {np.linalg.norm(grad_zero):.5f}")
         fun = lambda theta: f_logi_plus_lin(theta, grad_x_star)
         grad_fun = lambda theta: grad_f_logi_plus_lin(theta, grad_x_star)
 
@@ -268,7 +269,7 @@ def logistic_regression():
     
     # 4. Alternating dynamic step size mentionned by Das Gupta
     step_sizes_das_gupta = get_das_gupta_step_size50(L)
-    _, errors_das_gupta = gradient_descent_dynamic(f_logi, grad_f_logi, x0, f_star, step_sizes_das_gupta, 50)
+    _, errors_das_gupta = gradient_descent_dynamic(fun, grad_fun, x0, f_star, step_sizes_das_gupta, 50)
 
     # 5. Grimmer's pattern of size 31
     step_size_Grimmer31 = get_grimmer_step_size31(max_iter, L)
