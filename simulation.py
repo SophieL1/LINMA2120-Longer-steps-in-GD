@@ -110,6 +110,24 @@ def nesterov_accelerated_gradient_descent(fun, grad_fun, x0, f_star, max_iter, L
         t = t_next
     return x, errors
 
+def armijo_knowing_L(fun, grad_fun, x0, f_star, L, max_iter, eta=0.5):
+    x = x0
+    h = 1
+    errors = np.zeros(max_iter)
+    cum_iter = np.zeros(max_iter)
+    for i in range(max_iter):
+        errors[i] = fun(x) - f_star
+        iters = 2
+        fval = fun(x)
+        grad_val = grad_fun(x)
+        while fun(x - h/L * grad_fun(x)) > fval - eta * h/L * np.linalg.norm(grad_val)**2:
+            h *= 0.5
+            iters += 1
+        x = x - h/L * grad_val
+        cum_iter[i] = cum_iter[i-1] + iters
+        h *= 2
+    return x, errors, cum_iter
+
 # Compute specific stepsizes / schedules
 # Taylor, Hendricks and Glineur's optimal constant step size
 def get_optimal_constant_step_size(N, L):
