@@ -300,6 +300,12 @@ def logistic_regression():
 
     _, errors_nesterov = nesterov_accelerated_gradient_descent(fun, grad_fun, x0, f_star, max_iter, L)
 
+    # 7. Armijo rule with known Lipschitz constant
+    _, errors_armijo, cum_iter = armijo_knowing_L(fun, grad_fun, x0, f_star, L, max_iter, eta=0.5)
+    cum_iter = np.array(cum_iter)
+    cum_iter = cum_iter[cum_iter < max_iter]
+    errors_armijo = errors_armijo[:len(cum_iter)]
+
     # plot the results
     plt.plot(np.arange(max_iter), errors_classic, label="Constant stepsize 1")
     plt.plot(np.arange(max_iter), errors_optimal, label="Optimal constant stepsize $h_{\mathrm{opt}}$")
